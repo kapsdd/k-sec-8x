@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>KOVCHEGG-SECURE // /root/ — decoy</title>
+<link rel="icon" href="../favicon.ico">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<canvas id="rain"></canvas>
+<div class="crt"></div>
+
+<div class="shell">
+  <!--
+    // это лабиринт. тупик-симуляция.
+    // никаких фрагментов тут нет и не будет.
+    // выход всегда наверху: breadcrumbs.
+  -->
+  <header class="chassis">
+    <div class="chassis-bar">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="chassis-title">kovchegg-secure // /root/ — depth unknown</div>
+      <div>??</div>
+    </div>
+    <div class="chassis-body">
+      <nav class="hud" data-hud data-total="8"></nav>
+
+      <div class="label">Узел ?? // root-файловой системы</div>
+      <h1 class="glitch" data-text="ТЫ УШЁЛ ГЛУБОКО">ТЫ УШЁЛ ГЛУБОКО</h1>
+      <p class="lede">Ты открыл <code>/root/</code> — то, что robots.txt велел не трогать.</p>
+      <p class="alert">Каталог выглядит бесконечным. Он и есть бесконечный. По крайней мере, так задумано.</p>
+
+      <h2>Терминал root-файловой</h2>
+      <div class="term" id="mazeterm">
+        <div class="line warn">root-fs v0.0.0-decoy</div>
+        <div class="line sys">ты на глубине -1. каждая команда копает глубже.</div>
+        <div class="line sys">попробуй: cd, ls, find, out</div>
+      </div>
+      <div class="term-input-row">
+        <span class="prompt">root@void:/#</span>
+        <input class="term-input" id="mazecmd" type="text" autocomplete="off" spellcheck="false" aria-label="Команда root-файловой">
+      </div>
+
+      <div class="solve-box">
+        <div class="label">Внимание</div>
+        <p>Здесь <b>нет фрагментов протокола</b>. Это ложная тропа — такая тоже нужна хорошему АРГ.</p>
+        <p class="dim">Но тупиков не бывает. Выход всегда под рукой.</p>
+        <div class="row">
+          <a class="btn btn-amber" href="../index.html">Всплыть на поверхность</a>
+          <a class="btn" href="../map.html">К карте секторов</a>
+          <a class="btn btn-dim" href="../admin.html">По коридору дальше</a>
+        </div>
+      </div>
+
+      <div class="hints">
+        <button class="btn btn-amber hint-btn" data-hint="1" data-label="Улика I">Улика I</button>
+        <div class="hint-body" data-hint-body="1">«Ты не ошибся адресом — ошибся ожиданиями.<br>Здесь правда, но не та, которая нужна.<br>Кто всплывает — тот не тонет.»</div>
+      </div>
+
+      <div class="footnav">
+        <a class="btn btn-dim" href="../index.html">← Главный терминал</a>
+        <a class="btn btn-dim" href="../robots.txt">robots.txt</a>
+        <a class="btn btn-dim" href="../vault.html">Хранилище</a>
+      </div>
+    </div>
+  </header>
+</div>
+
+<script src="../js/core.js"></script>
+<script>
+(function () {
+  const term = document.getElementById("mazeterm");
+  const input = document.getElementById("mazecmd");
+  let depth = -1;
+
+  const DEPTHS = [
+    "каталог /root/void // подкаталоги ссылаются сами на себя",
+    "каталог /root/void/void // тут кто-то оставил надпись: «назад»",
+    "каталог /root/void/void/void // а здесь уже ничто",
+    "каталог /root/void/void/void/void // ты всё глубже",
+  ];
+
+  function print(text, cls) {
+    const div = document.createElement("div");
+    div.className = "line " + (cls || "");
+    div.textContent = text;
+    term.appendChild(div);
+    term.scrollTop = term.scrollHeight;
+  }
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    const raw = input.value.trim();
+    if (!raw) return;
+    input.value = "";
+    const cmd = raw.toLowerCase();
+    print("root@void:/# " + raw, "sys");
+
+    if (cmd === "out" || cmd === "exit" || cmd === "cd .." || cmd === "выход") {
+      print("всплытие ...", "ok");
+      print("совет kapsd: ложные тропы — часть дизайна. ты прошёл и эту.", "warn");
+      setTimeout(() => { window.location.href = "../map.html"; }, 700);
+      return;
+    }
+    if (cmd === "ls" || cmd === "find" || cmd === "cd" || cmd === "cd void") {
+      depth = Math.min(depth + 1, DEPTHS.length - 1);
+      print(DEPTHS[depth], "warn");
+      if (depth === DEPTHS.length - 1) {
+        print("", "sys");
+        print("симуляция глубины исчерпана. тут был просто красивый тупик.", "err");
+        print("настоящие фрагменты — на других узлах. поднимайся.", "warn");
+      }
+      return;
+    }
+    if (cmd === "help") {
+      print("команды: ls, find, cd, out, exit", "warn");
+      return;
+    }
+    print("root-fs: команда «" + raw + "» растворилась в пустоте", "err");
+  });
+
+  console.log("%c// ты в decoy. это тупик, но с выходом.", "color:#ff3355");
+  console.log("%c// выход: out / exit или кнопка наверху", "color:#ffb000");
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>KOVCHEGG-SECURE // ядро кода</title>
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="rain"></canvas>
+<div class="crt"></div>
+
+<div class="shell">
+  <!--
+    // узел 07 // финальная загадка
+    // xor key = 37, payload -> FIDJI
+    // ответ: FIDJI (то, что выведет код)
+  -->
+  <header class="chassis">
+    <div class="chassis-bar">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="chassis-title">kovchegg-secure // /core/decode.js</div>
+      <div>07</div>
+    </div>
+    <div class="chassis-body">
+      <nav class="hud" data-hud data-total="8"></nav>
+
+      <div class="label">Узел 07 // ядро кода</div>
+      <h1 class="glitch" data-text="ПОСЛЕДНИЙ ФРАГМЕНТ">ПОСЛЕДНИЙ ФРАГМЕНТ</h1>
+      <p class="lede">Этот модуль написал kapsd в последнюю ночь перед передачей архива. Он гордился им.</p>
+      <p>Задача стара как мир: <b>что выведет этот код?</b> Введи ровно то, что увидишь в консоли.</p>
+
+      <h2>Модуль decode.js</h2>
+      <pre class="code">const KEY = 37;
+
+// payload собран вручную, ночью, под "коча братана ебали"
+const payload = [99, 108, 97, 111, 108];
+
+function decode(arr, key) {
+  // чмоканье деда защищает этот цикл
+  return arr
+    .map((n) => String.fromCharCode(n ^ key))
+    .join("");
+}
+
+const result = decode(payload, KEY);
+console.log(result);</pre>
+
+      <p class="dim">Константы не обманывают. <code>^</code> — это XOR, не степень. <code>String.fromCharCode</code> превращает число в символ.</p>
+
+      <div class="solve-box">
+        <div class="label">Узел 07 // приём ответа</div>
+        <p>Введи <b>вывод консоли</b> — то, что напечатает <code>console.log(result)</code>.</p>
+        <form id="solve-form" data-feedback="#feedback">
+          <div class="row">
+            <input type="text" placeholder="вывод" aria-label="Ответ" required>
+            <button type="submit">Выполнить модуль</button>
+          </div>
+        </form>
+        <div class="feedback" id="feedback"></div>
+        <div class="frag-reveal" data-frag></div>
+      </div>
+
+      <div class="hints">
+        <button class="btn btn-amber hint-btn" data-hint="1" data-label="Улика I">Улика I</button>
+        <button class="btn btn-amber hint-btn" data-hint="2" data-label="Улика II">Улика II</button>
+        <div class="hint-body" data-hint-body="1">«XOR — не возведение в степень, а разбор:<br>там, где биты спорят, рождается знак.»</div>
+        <div class="hint-body" data-hint-body="2">«Пять букв — не подпись кода, а подпись автора.<br>Ищи не в цифрах, а в том, ради кого всё.»</div>
+      </div>
+
+      <div class="footnav">
+        <a class="btn btn-dim" href="index.html">← Главный терминал</a>
+        <a class="btn btn-dim" href="signal.html">← Радиомаяк</a>
+        <a class="btn btn-dim" href="vault.html">Хранилище</a>
+      </div>
+    </div>
+  </header>
+</div>
+
+<script src="js/core.js"></script>
+<script>
+(function () {
+  const K = window.KOVCHEGG;
+  K.bindSolve("#solve-form", ["fidji", "фиджи"], () => {
+    const fb = document.getElementById("feedback");
+    fb.className = "feedback show good";
+    fb.textContent = "МОДУЛЬ ВЫПОЛНЕН // FIDJI — и это последний фрагмент протокола.";
+    K.revealFragment(8, "FIDJI",
+      '<div class="next-node"><div class="label">Финал</div>' +
+      '<p>Все восемь фрагментов собраны. Протокол «КОВЧЕГГ» ждёт склейки.</p>' +
+      '<a href="vault.html">[ ОТКРЫТЬ ХРАНИЛИЩЕ: vault.html ]</a></div>'
+    );
+  });
+  console.log("%c// 99^37, 108^37, 97^37, 111^37, 108^37", "color:#4e8f66");
+})();
+</script>
+</body>
+</html>

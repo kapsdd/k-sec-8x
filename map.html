@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>KOVCHEGG-SECURE // карта секторов</title>
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="rain"></canvas>
+<div class="crt"></div>
+
+<div class="shell">
+  <!--
+    // узел 03 // метроидвания-протокол
+    // фрагмент 4 выдаётся за открытие ЯДРА, ответ = имя сервера
+    // следом идёт admin.html (ловушка) — но она того стоит
+  -->
+  <header class="chassis">
+    <div class="chassis-bar">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="chassis-title">kovchegg-secure // /world/sectors.map</div>
+      <div>03</div>
+    </div>
+    <div class="chassis-body">
+      <nav class="hud" data-hud data-total="8"></nav>
+
+      <div class="label">Узел 03 // карта секторов</div>
+      <h1 class="glitch" data-text="МЕТРОИДВАНИЯ ПРОТОКОЛА">МЕТРОИДВАНИЯ ПРОТОКОЛА</h1>
+      <p class="lede">Мир «Ковчегга» разбит на сектора. Двери не откроются без предметов — как в твоём любимом жанре.</p>
+      <p>Ищи предметы в комнатах. Закрытые двери подскажут, что именно им нужно.</p>
+
+      <h2>Сектора</h2>
+      <div class="map-grid" id="map-grid">
+        <button class="room" data-room="spawn" type="button">
+          <span class="room-name">01 // Спавн</span>
+          <span class="room-tag">● открыт</span>
+        </button>
+        <button class="room" data-room="mines" type="button">
+          <span class="room-name">02 // Шахты</span>
+          <span class="room-tag">● открыт</span>
+        </button>
+        <button class="room" data-room="library" type="button">
+          <span class="room-name">03 // Библиотека</span>
+          <span class="room-tag">● открыт</span>
+        </button>
+        <button class="room locked" data-room="necro" type="button">
+          <span class="room-name">04 // Некрополь</span>
+          <span class="room-tag">▲ требуется: ключ шахт</span>
+        </button>
+        <button class="room locked" data-room="relay" type="button">
+          <span class="room-name">05 // Реле</span>
+          <span class="room-tag">▲ требуется: резонатор</span>
+        </button>
+        <button class="room locked" data-room="core" type="button">
+          <span class="room-name">06 // Ядро</span>
+          <span class="room-tag">▲ требуется: морф-куля + питание</span>
+        </button>
+      </div>
+
+      <div class="solve-box" id="room-panel" aria-live="polite">
+        <div class="label">Инспектор сектора</div>
+        <p class="dim">Выбери комнату на карте.</p>
+      </div>
+
+      <div class="solve-box" id="core-form-wrap" style="display:none">
+        <div class="label">Ядро // ввод пароля</div>
+        <p>Ядро спрашивает: <b>«Как зовут арх, который ты защищаешь?»</b></p>
+        <form id="solve-form" data-feedback="#feedback">
+          <div class="row">
+            <input type="text" placeholder="имя сервера" aria-label="Ответ" required>
+            <button type="submit">Активировать ядро</button>
+          </div>
+        </form>
+        <div class="feedback" id="feedback"></div>
+        <div class="frag-reveal" data-frag></div>
+      </div>
+
+      <div class="hints">
+        <button class="btn btn-amber hint-btn" data-hint="1" data-label="Улика I">Улика I</button>
+        <button class="btn btn-amber hint-btn" data-hint="2" data-label="Улика II">Улика II</button>
+        <div class="hint-body" data-hint-body="1">«Три зала открыты, три заперты.<br>В открытых лежит то, что откроет закрытые.»</div>
+        <div class="hint-body" data-hint-body="2">«Ядро спрашивает имя того,<br>что вы строите — и что зовёте домом.»</div>
+      </div>
+
+      <div class="footnav">
+        <a class="btn btn-dim" href="index.html">← Главный терминал</a>
+        <a class="btn btn-dim" href="binary.html">← Бинарный узел</a>
+        <a class="btn btn-dim" href="vault.html">Хранилище</a>
+      </div>
+    </div>
+  </header>
+</div>
+
+<script src="js/core.js"></script>
+<script>
+(function () {
+  const K = window.KOVCHEGG;
+  const state = {
+    items: { keyMines: false, morph: false, resonator: false, power: false },
+    opened: { spawn: true, mines: true, library: true, necro: false, relay: false, core: false },
+  };
+
+  const ROOMS = {
+    spawn: {
+      name: "01 // Спавн",
+      body: () => `
+        <p>Точка возрождения архива. Здесь kapsd впервые открыл протокол и оставил тебе карту.</p>
+        <p class="dim">Правило мира: без предметов двери не сдаются. Но каждая комната — это ещё и улика.</p>
+        <p class="amber">Предметы не теряются. Открой Шахты и Библиотеку.</p>`,
+    },
+    mines: {
+      name: "02 // Шахты",
+      body: () => {
+        if (!state.items.keyMines) {
+          state.items.keyMines = true;
+          setRoomTag("mines", "● предмет найден", false);
+          return `
+            <p>Глубины под Ковчеггом. Стены светятся редстоуном, в шахтах кто-то оставил сундук.</p>
+            <p class="phos">НАЙДЕН ПРЕДМЕТ: <b>КЛЮЧ ШАХТ</b></p>
+            <p class="dim">«Ключ шахт» открывает Некрополь. Старые рельсы туда ведут — как в метроидвании, только под спавном.</p>`;
+        }
+        return `
+          <p>Шахты уже обысканы. В глубине слышен гул реле.</p>
+          <p class="phos">В ИНВЕНТАРЕ: КЛЮЧ ШАХТ</p>`;
+      },
+    },
+    library: {
+      name: "03 // Библиотека",
+      body: () => {
+        if (!state.items.morph) {
+          state.items.morph = true;
+          setRoomTag("library", "● предмет найден", false);
+          return `
+            <p>Полки с логами всех сезонов сервера. Тут пишут историю — и прячут инструменты.</p>
+            <p class="phos">НАЙДЕН ПРЕДМЕТ: <b>МОРФ-КУЛЯ</b></p>
+            <p>Морф-куля позволяет пролезать в узкие проходы ядра. Да-да, отсылка к твоему любимому жанру сделана не зря.</p>
+            <p class="amber">Книга с полки: «Ядро отвечает только на имя арха. Всё остальное — шум.»</p>`;
+        }
+        return `
+          <p>Библиотека хранит мемуары Ковчегга: сезоны, войны, мирные договоры и лестницу, на которой убили Кабилджона.</p>
+          <p class="phos">В ИНВЕНТАРЕ: МОРФ-КУЛЯ</p>`;
+      },
+    },
+    necro: {
+      name: "04 // Некрополь",
+      body: () => {
+        if (!state.items.keyMines) {
+          return `<p class="alert">ДВЕРЬ ЗАПЕРТА. ТРЕБУЕТСЯ: КЛЮЧ ШАХТ</p>
+            <p class="dim">За дверью шёпот. Кто-то шепчет «коч братана» и не может остановиться.</p>`;
+        }
+        if (!state.items.resonator) {
+          state.items.resonator = true;
+          setRoomTag("necro", "● предмет найден", false);
+          state.opened.necro = true;
+          return `
+            <p>Здесь похоронены старые сезоны сервера. Надписи на плитах: «здесь лежит тот, кто копал без кирки».</p>
+            <p class="phos">НАЙДЕН ПРЕДМЕТ: <b>РЕЗОНАТОР</b></p>
+            <p class="amber">В углу кто-то оставил граффити: «Коча братана ебали — но резонатор остался».</p>
+            <p class="dim">Резонатор будит Реле.</p>`;
+        }
+        return `<p>Некрополь тих. Остались только надписи и одна живая шутка.</p>
+          <p class="phos">В ИНВЕНТАРЕ: РЕЗОНАТОР</p>`;
+      },
+    },
+    relay: {
+      name: "05 // Реле",
+      body: () => {
+        if (!state.items.resonator) {
+          return `<p class="alert">ДВЕРЬ ЗАПЕРТА. ТРЕБУЕТСЯ: РЕЗОНАТОР</p>
+            <p class="dim">Реле молчит без резонанса.</p>`;
+        }
+        if (!state.items.power) {
+          state.items.power = true;
+          setRoomTag("relay", "● предмет найден", false);
+          state.opened.relay = true;
+          return `
+            <p>Высоковольтный узел. Конденсаторы гудят, как будто кто-то держит чмоканье деда на паузе.</p>
+            <p class="phos">НАЙДЕН ПРЕДМЕТ: <b>ПИТАНИЕ ЯДРА</b></p>
+            <p class="dim">Осталось добраться до Ядра. Оно принимает только тех, у кого есть морф-куля и питание.</p>`;
+        }
+        return `<p>Реле работает. Энергия течёт в Ядро.</p>
+          <p class="phos">В ИНВЕНТАРЕ: ПИТАНИЕ ЯДРА</p>`;
+      },
+    },
+    core: {
+      name: "06 // Ядро",
+      body: () => {
+        const ready = state.items.morph && state.items.power;
+        if (!ready) {
+          const missing = [];
+          if (!state.items.morph) missing.push("МОРФ-КУЛЯ");
+          if (!state.items.power) missing.push("ПИТАНИЕ ЯДРА");
+          return `<p class="alert">ДВЕРЬ ЗАПЕРТА. ТРЕБУЕТСЯ: ${missing.join(" + ")}</p>
+            <p class="dim">Ядро шумит и задаёт вопрос, но ответить можно только изнутри.</p>`;
+        }
+        state.opened.core = true;
+        setRoomTag("core", "● ядро доступно", false);
+        document.getElementById("core-form-wrap").style.display = "block";
+        return `
+          <p>Сердце архива. Здесь хранится протокол доступа «Ковчегг».</p>
+          <p class="amber">Ядро задаёт вопрос — он уже ждёт ниже.</p>
+          <p class="dim">«Как зовут арх, который ты защищаешь?»</p>`;
+      },
+    },
+  };
+
+  function setRoomTag(room, text, locked) {
+    const btn = document.querySelector(`[data-room="${room}"]`);
+    if (!btn) return;
+    const tag = btn.querySelector(".room-tag");
+    if (tag) tag.textContent = text;
+    if (!locked) btn.classList.remove("locked");
+    btn.classList.add("opened");
+  }
+
+  function renderInventory() {
+    const inv = [];
+    if (state.items.keyMines) inv.push("КЛЮЧ ШАХТ");
+    if (state.items.morph) inv.push("МОРФ-КУЛЯ");
+    if (state.items.resonator) inv.push("РЕЗОНАТОР");
+    if (state.items.power) inv.push("ПИТАНИЕ ЯДРА");
+    return `<p class="dim" style="margin-top:14px">ИНВЕНТАРЬ: ${inv.length ? inv.join(" · ") : "пусто"}</p>`;
+  }
+
+  const panel = document.getElementById("room-panel");
+
+  document.querySelectorAll(".room").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.room;
+      const room = ROOMS[key];
+      if (!room) return;
+      panel.innerHTML =
+        `<div class="label">Инспектор сектора</div>` +
+        `<h3>${room.name}</h3>` +
+        room.body() +
+        renderInventory();
+    });
+  });
+
+  K.bindSolve("#solve-form", ["ковчегг", "ковчег", "kovchegg", "kovcheg"], () => {
+    const fb = document.getElementById("feedback");
+    fb.className = "feedback show good";
+    fb.textContent = "ЯДРО АКТИВИРОВАНО // имя арха принято. Протокол частично восстановлен.";
+    K.revealFragment(4, "//",
+      '<div class="next-node"><div class="label">Следующий узел</div>' +
+      '<p>Фрагмент-разделитель <b>//</b>. Да, это просто два слэша — комментарии в коде тоже часть протокола. kapsd бы оценил.</p>' +
+      '<p>В системных журналах мелькала root-панель. Кто-то даже восстановил её: <code>admin.html</code>. Проверь — но помни, что root-панели любят врать.</p>' +
+      '<a href="admin.html">[ К ПОДОЗРИТЕЛЬНОЙ ROOT-ПАНЕЛИ: admin.html ]</a></div>'
+    );
+  });
+
+  console.log("%c// метроидвания: способности открывают двери, а не наоборот", "color:#ffb000");
+})();
+</script>
+</body>
+</html>

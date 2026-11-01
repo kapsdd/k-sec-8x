@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>KOVCHEGG-SECURE // радиомаяк</title>
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="rain"></canvas>
+<div class="crt"></div>
+
+<div class="shell">
+  <!--
+    // узел 06 // морзе
+    // транскрипт: -.-. --- -- -- . -. -  = COMMENT
+    // ответ: комментарий / comment
+    // фрагмент 7 = //
+  -->
+  <header class="chassis">
+    <div class="chassis-bar">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="chassis-title">kovchegg-secure // /signal/beacon-06</div>
+      <div>06</div>
+    </div>
+    <div class="chassis-body">
+      <nav class="hud" data-hud data-total="8"></nav>
+
+      <div class="label">Узел 06 // радиомаяк</div>
+      <h1 class="glitch" data-text="МАЯК ВЕЩАЕТ">МАЯК ВЕЩАЕТ</h1>
+      <p class="lede">Старый маяк «Ковчегга» передаёт короткое слово по кругу. Кто-то давно настроил его на азбуку Морзе.</p>
+      <p>Смотри на вспышки: <b>точка</b> короткая, <b>тире</b> длинная. Пауза между буквами — широкая.</p>
+
+      <h2>Трансляция</h2>
+      <div class="beacon" id="beacon" aria-label="Мигающий маяк в азбуке Морзе"></div>
+      <div class="row">
+        <button class="btn" id="play-btn" type="button">Воспроизвести сигнал</button>
+        <button class="btn btn-dim" id="trans-btn" type="button">Показать транскрипт</button>
+      </div>
+      <pre class="code" id="transcript" style="display:none">-.-.   ---   --   --   .   -.   -</pre>
+      <p class="dim">Транскрипт — семь групп. Каждая группа — буква. Слово английское, означает «примечание в коде».</p>
+
+      <div class="solve-box">
+        <div class="label">Узел 06 // приём ответа</div>
+        <p>Расшифруй сигнал маяка и введи <b>слово</b>. На русском или английском — приму оба.</p>
+        <form id="solve-form" data-feedback="#feedback">
+          <div class="row">
+            <input type="text" placeholder="слово" aria-label="Ответ" required>
+            <button type="submit">Принять сигнал</button>
+          </div>
+        </form>
+        <div class="feedback" id="feedback"></div>
+        <div class="frag-reveal" data-frag></div>
+      </div>
+
+      <div class="hints">
+        <button class="btn btn-amber hint-btn" data-hint="1" data-label="Улика I">Улика I</button>
+        <button class="btn btn-amber hint-btn" data-hint="2" data-label="Улика II">Улика II</button>
+        <div class="hint-body" data-hint-body="1">«Короткая вспышка — точка.<br>Длинная — тире. Молчание между ними — тоже буквы.»</div>
+        <div class="hint-body" data-hint-body="2">«Семь знаков, одно слово:<br>то, что пишут, чтобы код не молчал.»</div>
+      </div>
+
+      <div class="footnav">
+        <a class="btn btn-dim" href="index.html">← Главный терминал</a>
+        <a class="btn btn-dim" href="stego.html">← Повреждённый файл</a>
+        <a class="btn btn-dim" href="vault.html">Хранилище</a>
+      </div>
+    </div>
+  </header>
+</div>
+
+<script src="js/core.js"></script>
+<script>
+(function () {
+  const K = window.KOVCHEGG;
+  const beacon = document.getElementById("beacon");
+  // C O M M E N T
+  const LETTERS = ["-.-.", "---", "--", "--", ".", "-.", "-"];
+
+  function renderBeacon(activeIndex) {
+    beacon.innerHTML = "";
+    LETTERS.forEach((group, gi) => {
+      group.split("").forEach((sym, si) => {
+        const el = document.createElement("span");
+        el.className = sym === "." ? "dot" : "dash";
+        if (activeIndex === gi) el.style.opacity = "1";
+        else el.style.opacity = activeIndex === null ? "1" : "0.25";
+        beacon.appendChild(el);
+      });
+      const gap = document.createElement("span");
+      gap.className = "gap";
+      beacon.appendChild(gap);
+    });
+  }
+  renderBeacon(null);
+
+  let playing = false;
+  document.getElementById("play-btn").addEventListener("click", () => {
+    if (playing) return;
+    playing = true;
+    let i = 0;
+    renderBeacon(0);
+    const t = setInterval(() => {
+      i++;
+      if (i >= LETTERS.length) {
+        clearInterval(t);
+        renderBeacon(null);
+        playing = false;
+        return;
+      }
+      renderBeacon(i);
+    }, 420);
+  });
+
+  document.getElementById("trans-btn").addEventListener("click", () => {
+    const tr = document.getElementById("transcript");
+    tr.style.display = tr.style.display === "none" ? "block" : "none";
+  });
+
+  K.bindSolve("#solve-form", ["comment", "комментарий", "комент", "коммент"], () => {
+    const fb = document.getElementById("feedback");
+    fb.className = "feedback show good";
+    fb.textContent = "СИГНАЛ ПРИНЯТ // COMMENT. Маяк замолчал — значит, услышал.";
+    K.revealFragment(7, "//",
+      '<div class="next-node"><div class="label">Последний узел</div>' +
+      '<p>Фрагмент <b>//</b> — второй разделитель. Всё сходится: комментарии, маяки, протокол.</p>' +
+      '<p>Осталось ядро кода. Одна задачка — и у тебя будет последний фрагмент.</p>' +
+      '<a href="core.html">[ К ЯДРУ КОДА: core.html ]</a></div>'
+    );
+  });
+
+  console.log("%c// COMMENT", "color:#33ff66");
+  console.log("%c// это и есть ответ", "color:#ffb000");
+})();
+</script>
+</body>
+</html>

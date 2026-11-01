@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>KOVCHEGG-SECURE // журнал system-07</title>
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="rain"></canvas>
+<div class="crt"></div>
+
+<div class="shell">
+  <!--
+    // узел 02 // сдвиг = 7 (system-07)
+    // алфавит русский, 33 буквы, ё на месте
+    // назад: index.html
+  -->
+  <header class="chassis">
+    <div class="chassis-bar">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="chassis-title">kovchegg-secure // /var/log/system-07</div>
+      <div>01</div>
+    </div>
+    <div class="chassis-body">
+      <nav class="hud" data-hud data-total="8"></nav>
+
+      <div class="label">Узел 01 // системный журнал</div>
+      <h1 class="glitch" data-text="ЖУРНАЛ ПОВРЕЖДЁН">ЖУРНАЛ ПОВРЕЖДЁН</h1>
+      <p class="lede">Файл <code>system-07</code> частично деградировал. Строки смещены — кем-то, кто знал про сдвиг.</p>
+      <p>Оператор kapsd шифровал журнал простым шифром сдвига. Имя файла — не просто номер.</p>
+
+      <h2>Выгрузка лога</h2>
+      <table class="log">
+        <thead>
+          <tr><th>время</th><th>поток</th><th>содержимое (повреждено)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>07:07:07</td><td>ark.core</td>
+            <td>СТЕЮ ОЛТМФВР</td>
+          </tr>
+          <tr>
+            <td>07:07:19</td><td>ark.route</td>
+            <td>ЦЛЧЛРКП И ЗПФЖЧФВР ЪОЛТ</td>
+          </tr>
+          <tr>
+            <td>07:07:42</td><td>ark.core</td>
+            <td>НЪЧФЖТ ЦХИЧЛНКМФ ФХ СХК НПИ</td>
+          </tr>
+          <tr>
+            <td>07:08:01</td><td>ark.route</td>
+            <td>ШТЛКЪЕАПР ЪОЛТ НКМЩ</td>
+          </tr>
+          <tr>
+            <td>07:08:13</td><td>root.panel</td>
+            <td class="alert">root-панель восстановлена: admin.html // ключ root допущен</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="dim">Последняя строка — единственная, что не смещена. Странно, правда?</p>
+
+      <div class="solve-box">
+        <div class="label">Узел 01 // приём ответа</div>
+        <p>Расшифруй журнал. Введи <b>ключ</b>, который называет первая строка (одно слово).</p>
+        <form id="solve-form" data-feedback="#feedback">
+          <div class="row">
+            <input type="text" placeholder="ключ" aria-label="Ответ" required>
+            <button type="submit">Отправить ключ</button>
+          </div>
+        </form>
+        <div class="feedback" id="feedback"></div>
+        <div class="frag-reveal" data-frag></div>
+      </div>
+
+      <div class="hints">
+        <button class="btn btn-amber hint-btn" data-hint="1" data-label="Улика I">Улика I</button>
+        <button class="btn btn-amber hint-btn" data-hint="2" data-label="Улика II">Улика II</button>
+        <div class="hint-body" data-hint-body="1">«Кто двигал буквы вперёд, мог уйти назад.<br>Круг азбуки замкнут — и ё в нём не потерян.»</div>
+        <div class="hint-body" data-hint-body="2">«Число прыжков не в звёздах — в имени файла.<br>`system-07` — не номер квартиры.»</div>
+      </div>
+
+      <div class="footnav">
+        <a class="btn btn-dim" href="index.html">← Главный терминал</a>
+        <a class="btn btn-dim" href="vault.html">Хранилище</a>
+      </div>
+    </div>
+  </header>
+</div>
+
+<script src="js/core.js"></script>
+<script>
+(function () {
+  const K = window.KOVCHEGG;
+  K.bindSolve("#solve-form", ["зелёный", "зеленый", "ключ зелёный", "ключ зеленый"], () => {
+    const fb = document.getElementById("feedback");
+    fb.className = "feedback show good";
+    fb.textContent = "ЖУРНАЛ РАСШИФРОВАН\n«КЛЮЧ ЗЕЛЁНЫЙ. ПЕРЕЙДИ В БИНАРНЫЙ УЗЕЛ.»\n«ЖУРНАЛ ПОВРЕЖДЁН, НО КОД ЖИВ.»";
+    K.revealFragment(2, "CHE",
+      '<div class="next-node"><div class="label">Следующий узел</div>' +
+      '<p>Маршрут из журнала: бинарный узел. Там данные лежат нулями и единицами.</p>' +
+      '<a href="binary.html">[ ПЕРЕЙТИ В БИНАРНЫЙ УЗЕЛ: binary.html ]</a></div>' +
+      '<p class="dim" style="margin-top:12px">И да — root-панель из последней строки. Проверить её — не самая плохая идея. Но не спеши.</p>'
+    );
+  });
+  console.log("%c// сдвиг равен номеру файла", "color:#ffb000");
+})();
+</script>
+</body>
+</html>

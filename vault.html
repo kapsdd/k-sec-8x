@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>KOVCHEGG-SECURE // хранилище</title>
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="rain"></canvas>
+<div class="crt"></div>
+
+<div class="shell">
+  <header class="chassis">
+    <div class="chassis-bar">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="chassis-title">kovchegg-secure // /vault — sealed</div>
+      <div>08</div>
+    </div>
+    <div class="chassis-body">
+      <nav class="hud" data-hud data-total="8"></nav>
+
+      <div class="label">Финал // хранилище протокола</div>
+      <h1 class="glitch" data-text="ХРАНИЛИЩЕ">ХРАНИЛИЩЕ</h1>
+      <p class="lede">Здесь заканчивается архив и начинается живая часть протокола.</p>
+      <p>Склей восемь фрагментов <b>в порядке слотов 1 → 8</b>, без пробелов. Получится одна строка — код доступа.</p>
+
+      <h2>Панель фрагментов</h2>
+      <div class="map-grid" id="frag-panel" style="grid-template-columns: repeat(4, 1fr);"></div>
+      <p class="dim">Звёздочка в HUD наверху означает заполненный слот. Если слот пуст — вернись на нужный узел и реши загадку.</p>
+
+      <h2>Ввод кода доступа</h2>
+      <div class="solve-box">
+        <div class="label">vault // authenticate</div>
+        <form id="vault-form">
+          <div class="row">
+            <input type="text" id="vault-input" placeholder="КОД ДОСТУПА" aria-label="Код доступа" required autocomplete="off" spellcheck="false">
+            <button type="submit">Открыть хранилище</button>
+          </div>
+        </form>
+        <div class="feedback" id="vault-feedback"></div>
+      </div>
+
+      <!-- ── ФАЗА 2: живой протокол ─────────────────────────── -->
+      <section id="phase2" hidden>
+        <hr class="hr">
+        <h2>Фаза 2 // живой протокол</h2>
+        <p class="lede">Архив открыт. Но код финала не хранится в файлах — он хранится в людях.</p>
+        <p>Четыре контакта. Каждый даст тебе кусочек кода, если ты напишешь ему <b>правильные слова</b>. Слова подсказки — в описании контакта. Всё остальное — от тебя.</p>
+        <p class="dim">Введи полученный код в соответствующий контакт. Коды чувствительны к смыслу, не к регистру.</p>
+
+        <div id="contacts"></div>
+
+        <div class="feedback" id="p2-feedback"></div>
+      </section>
+
+      <!-- ── Таблица восстановления (фаза 1) ─────────────────── -->
+      <h2>Если что-то потерялось</h2>
+      <table class="log">
+        <thead><tr><th>слот</th><th>узел</th><th>что там</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><a href="index.html">index.html</a></td><td>терминал, base64-манифест</td></tr>
+          <tr><td>2</td><td><a href="logs-07.html">logs-07.html</a></td><td>журнал, шифр сдвига</td></tr>
+          <tr><td>3</td><td><a href="binary.html">binary.html</a></td><td>бинарный поток</td></tr>
+          <tr><td>4</td><td><a href="map.html">map.html</a></td><td>карта секторов, метроидвания</td></tr>
+          <tr><td>5</td><td><a href="admin.html">admin.html</a></td><td>ловушка root-панели</td></tr>
+          <tr><td>6</td><td><a href="stego.html">stego.html</a></td><td>повреждённый файл, скрытый слой</td></tr>
+          <tr><td>7</td><td><a href="signal.html">signal.html</a></td><td>радиомаяк, азбука Морзе</td></tr>
+          <tr><td>8</td><td><a href="core.html">core.html</a></td><td>ядро кода, XOR-модуль</td></tr>
+        </tbody>
+      </table>
+
+      <div class="footnav">
+        <a class="btn btn-dim" href="index.html">← Главный терминал</a>
+        <a class="btn btn-dim" href="robots.txt">robots.txt</a>
+      </div>
+    </div>
+  </header>
+</div>
+
+<div class="vault-flash" id="flash" role="dialog" aria-label="Доступ разрешён">
+  <div class="inner">
+    <div class="label">kovchegg-secure // vault opened</div>
+    <h1 class="phos">ДОСТУП РАЗРЕШЁН</h1>
+    <div id="final-message"></div>
+    <div class="row" style="margin-top:18px">
+      <button class="btn" id="flash-close" type="button">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/quest.js"></script>
+<script>
+(function () {
+  const K = window.KOVCHEGG;
+  const Q = window.QUEST;
+
+  /* ---------- фаза 1: склейка фрагментов ---------- */
+  function renderPanel() {
+    const all = K.readFragments();
+    const mount = document.getElementById("frag-panel");
+    let html = "";
+    for (let i = 1; i <= 8; i++) {
+      const v = all[i];
+      html += `<div class="hud-slot ${v ? "on" : ""}" style="min-width:0;padding:12px 8px">${i}. ${v ? K.escapeHtml(v) : "[пусто]"}</div>`;
+    }
+    mount.innerHTML = html;
+  }
+  renderPanel();
+  window.addEventListener("storage", renderPanel);
+
+  function normCode(s) {
+    return K.normalize(s).replace(/\s*\/\s*/g, "//").replace(/\s+/g, "");
+  }
+
+  /* ---------- фаза 2: состояние контактов ---------- */
+  const P2_KEY = "kovchegg_phase2_v1";
+
+  function readP2() {
+    try {
+      const raw = K.store.getItem(P2_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function saveP2(obj) {
+    K.store.setItem(P2_KEY, JSON.stringify(obj));
+  }
+
+  function renderContacts() {
+    const done = readP2();
+    const mount = document.getElementById("contacts");
+    let html = "";
+    Q.phase2.forEach((c, idx) => {
+      const solved = Boolean(done[c.id]);
+      const prevOk = idx === 0 || Boolean(done[Q.phase2[idx - 1].id]);
+      const open = solved || prevOk;
+      html += `
+        <div class="solve-box" style="opacity:${open ? 1 : 0.45}">
+          <div class="label">${K.escapeHtml(c.title)} ${solved ? "· ЗАКРЫТ" : open ? "· ОТКРЫТ" : "· ЗАБЛОКИРОВАН"}</div>
+          <p>${K.escapeHtml(c.brief)}</p>
+          <p class="amber">${K.escapeHtml(c.say)}</p>
+          ${solved
+            ? `<div class="feedback show good">КОД ПРИНЯТ // контакт подтверждён.</div>`
+            : open
+              ? `<form data-contact="${c.id}">
+                   <div class="row">
+                     <input type="text" placeholder="код от контакта ${c.id}" aria-label="Код контакта ${c.id}" autocomplete="off" spellcheck="false" ${prevOk ? "" : "disabled"}>
+                     <button type="submit" ${prevOk ? "" : "disabled"}>Передать код</button>
+                   </div>
+                 </form>`
+              : `<p class="dim">Сначала закрой контакт ${idx}.</p>`}
+          <div class="hints" style="margin-top:12px">
+            <button class="btn btn-amber hint-btn" data-hint="c${c.id}" data-label="Личная подсказка">Личная подсказка</button>
+            <div class="hint-body" data-hint-body="c${c.id}">${K.escapeHtml(c.hint)}</div>
+          </div>
+        </div>`;
+    });
+    mount.innerHTML = html;
+
+    mount.querySelectorAll("form[data-contact]").forEach((form) => {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const id = Number(form.dataset.contact);
+        const cfg = Q.phase2.find((x) => x.id === id);
+        const input = form.querySelector("input");
+        const ok = K.hash1a(input.value) === cfg.hash;
+        const fb = document.getElementById("p2-feedback");
+        if (ok) {
+          const st = readP2();
+          st[id] = 1;
+          saveP2(st);
+          fb.className = "feedback show good";
+          fb.textContent = "КОД ПРИНЯТ // контакт " + id + " закрыт.";
+          renderContacts();
+          if (Object.keys(readP2()).length >= Q.phase2.length) {
+            openFinal();
+          } else {
+            const next = document.querySelector("#contacts .solve-box:nth-child(" + (id + 1) + ")");
+            if (next) next.scrollIntoView({ behavior: K.REDUCED ? "auto" : "smooth", block: "center" });
+          }
+        } else {
+          fb.className = "feedback show bad";
+          fb.textContent = "КОД НЕ ПРИНЯТ // проверь, что тебе ответил контакт " + id + ".";
+          input.select();
+        }
+      });
+    });
+
+    // подсказки контактов — через общий механизм bindHints не получится (динамика)
+    mount.querySelectorAll("[data-hint]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const body = mount.querySelector(`[data-hint-body="${btn.dataset.hint}"]`);
+        if (body) {
+          body.classList.toggle("show");
+          btn.textContent = body.classList.contains("show") ? "Скрыть подсказку" : "Личная подсказка";
+        }
+      });
+    });
+  }
+
+  /* ---------- финал ---------- */
+  function openFinal() {
+    document.getElementById("final-message").innerHTML = Q.readFinalMessage();
+    document.getElementById("flash").classList.add("show");
+    document.getElementById("flash-close").focus();
+    K.store.setItem("kovchegg_vault_opened", "1");
+  }
+
+  function openPhase2() {
+    document.getElementById("phase2").hidden = false;
+    renderContacts();
+    document.getElementById("phase2").scrollIntoView({ behavior: K.REDUCED ? "auto" : "smooth", block: "start" });
+    if (Object.keys(readP2()).length >= Q.phase2.length) openFinal();
+  }
+
+  document.getElementById("vault-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const raw = document.getElementById("vault-input").value;
+    const ok = K.hash1a(raw) === Q.accessCodeHash;
+    const fb = document.getElementById("vault-feedback");
+
+    if (ok) {
+      fb.className = "feedback show good";
+      fb.textContent = "КОД ПРИНЯТ // хранилище распаковано. Внизу — фаза 2.";
+      K.store.setItem("kovchegg_phase1_ok", "1");
+      openPhase2();
+    } else {
+      fb.className = "feedback show bad";
+      const all = K.readFragments();
+      const n = Object.keys(all).filter((k) => all[k]).length;
+      fb.textContent =
+        "КОД ОТКЛОНЁН // собрано фрагментов: " + n + "/8.\n" +
+        (n < 8
+          ? "Не все слоты заполнены. Сверься с таблицей узлов."
+          : "Все фрагменты на месте — но склейка неверная. Порядок слотов 1 → 8, без пробелов.");
+    }
+  });
+
+  document.getElementById("flash-close").addEventListener("click", () => {
+    document.getElementById("flash").classList.remove("show");
+  });
+
+  // если фаза 1 уже пройдена — сразу показать фазу 2
+  if (K.store.getItem("kovchegg_phase1_ok") === "1") openPhase2();
+})();
+</script>
+</body>
+</html>

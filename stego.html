@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>KOVCHEGG-SECURE // повреждённый файл</title>
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="rain"></canvas>
+<div class="crt"></div>
+
+<div class="shell">
+  <!--
+    // узел 05 // stego
+    // скрытый слой: KOL
+    // кнопка сканирования — не единственная ниточка. console.log тоже ждёт.
+  -->
+  <header class="chassis">
+    <div class="chassis-bar">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="chassis-title">kovchegg-secure // /var/fragments/damaged_05.bin</div>
+      <div>05</div>
+    </div>
+    <div class="chassis-body">
+      <nav class="hud" data-hud data-total="8"></nav>
+
+      <div class="label">Узел 05 // стеганография</div>
+      <h1 class="glitch" data-text="ФАЙЛ ПОВРЕЖДЁН">ФАЙЛ ПОВРЕЖДЁН</h1>
+      <p class="lede">Поверхностный слой файла — шум. Но kapsd никогда не оставлял шум без причины.</p>
+      <p>Первую половину слова «ПРОТОКОЛ» ты уже получил в root-панели. Здесь — вторая.</p>
+
+      <h2>Слой 0 // визуальный шум</h2>
+      <div class="stego-stage" id="stage">
+        <div class="stego-noise" id="noise">010010110100111101001100 0101000001010010010011110101010001001111 010010110100111101001100 010100110100101101011001 0100011001010010010000010100011101001101010001010100111001010100 01000110010100100100000101000111 010010110100111101001100 010100110100101101011001 010010110100111101001100 010100110100101101011001 010010110100111101001100 010100110100101101011001 0100111001001111010010010101001101000101 010010110100111101001100</div>
+        <div class="stego-secret" id="secret">СКРЫТЫЙ СЛОЙ: KOL</div>
+      </div>
+
+      <div class="row" style="margin-top:14px">
+        <button class="btn" id="scan-btn" type="button">Просканировать файл</button>
+        <button class="btn btn-dim" id="reset-btn" type="button">Сброс</button>
+      </div>
+
+      <div class="solve-box">
+        <div class="label">Узел 05 // приём ответа</div>
+        <p>Введи <b>скрытый слой</b> — три буквы, которые ждут под шумом.</p>
+        <form id="solve-form" data-feedback="#feedback">
+          <div class="row">
+            <input type="text" placeholder="три буквы" aria-label="Ответ" required>
+            <button type="submit">Извлечь слой</button>
+          </div>
+        </form>
+        <div class="feedback" id="feedback"></div>
+        <div class="frag-reveal" data-frag></div>
+      </div>
+
+      <div class="hints">
+        <button class="btn btn-amber hint-btn" data-hint="1" data-label="Улика I">Улика I</button>
+        <button class="btn btn-amber hint-btn" data-hint="2" data-label="Улика II">Улика II</button>
+        <div class="hint-body" data-hint-body="1">«Шум — лишь маска.<br>Под маской — то, что ждало тебя.»</div>
+        <div class="hint-body" data-hint-body="2">«Три буквы — половина протокола.<br>Спрятаны там, где глаз не ищет.»</div>
+      </div>
+
+      <div class="footnav">
+        <a class="btn btn-dim" href="index.html">← Главный терминал</a>
+        <a class="btn btn-dim" href="admin.html">← Root-панель</a>
+        <a class="btn btn-dim" href="vault.html">Хранилище</a>
+      </div>
+    </div>
+  </header>
+</div>
+
+<script src="js/core.js"></script>
+<script>
+(function () {
+  const K = window.KOVCHEGG;
+  const stage = document.getElementById("stage");
+  const noise = document.getElementById("noise");
+
+  // заполняем шум псевдослучайными битами, но сохраняем спрятанное сообщение
+  const filler = "01";
+  let seed = "kovchegg".split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+  function randBits(n) {
+    let s = "";
+    for (let i = 0; i < n; i++) {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      s += (seed >> 8) % 2;
+    }
+    return s;
+  }
+  noise.textContent = randBits(1400);
+
+  document.getElementById("scan-btn").addEventListener("click", () => {
+    stage.classList.add("scanned");
+  });
+  document.getElementById("reset-btn").addEventListener("click", () => {
+    stage.classList.remove("scanned");
+  });
+
+  K.bindSolve("#solve-form", ["kol", "кол", "k0l"], () => {
+    const fb = document.getElementById("feedback");
+    fb.className = "feedback show good";
+    fb.textContent = "СЛОЙ ИЗВЛЕЧЁН // PROTO + KOL = PROTOKOL. Слово собрано.";
+    K.revealFragment(6, "KOL",
+      '<div class="next-node"><div class="label">Следующий узел</div>' +
+      '<p>Остался радиомаяк. Он вещает уже давно — просто никто не слушал.</p>' +
+      '<a href="signal.html">[ ПЕРЕЙТИ К МАЯКУ: signal.html ]</a></div>'
+    );
+  });
+
+  console.log("%c// в этом файле два слоя", "color:#33ff66");
+  console.log("%c// второй слой: KOL", "color:#ffb000");
+  console.log("%c// не подглядывай... ладно, подглядывай. ты же программист.", "color:#4e8f66");
+})();
+</script>
+</body>
+</html>

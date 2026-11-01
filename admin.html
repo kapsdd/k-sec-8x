@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>KOVCHEGG-SECURE // root panel</title>
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="rain"></canvas>
+<div class="crt"></div>
+
+<div class="shell">
+  <!--
+    // это ловушка. honeypot. псевдо-root.
+    // но даже ловушка оставила фрагмент протокола: PROTO
+    // выход: команда escape (или кнопка)
+  -->
+  <header class="chassis">
+    <div class="chassis-bar">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="chassis-title">kovchegg-secure // /root/panel — access restricted</div>
+      <div>!!</div>
+    </div>
+    <div class="chassis-body">
+      <nav class="hud" data-hud data-total="8"></nav>
+
+      <div class="label">Узел ?? // root-панель</div>
+      <h1 class="glitch" data-text="ДОСТУП ЗАПРЕЩЁН">ДОСТУП ЗАПРЕЩЁН</h1>
+      <p class="lede">Ты нашёл root-панель. Она выглядит настоящей. Слишком настоящей.</p>
+      <p><span class="tag hot">WARNING</span> <span class="tag">HONEYPOT?</span> <span class="tag live">ROOT-0</span></p>
+
+      <h2>Авторизация root</h2>
+      <div class="term" id="faketerm">
+        <div class="line sys">KOVCHEGG ROOT GATE v0.9.2</div>
+        <div class="line warn">ВНИМАНИЕ: гостевая сессия FIDJI обнаружена в root-зоне.</div>
+        <div class="line err">ЭТА ЗОНА НЕ ПРЕДНАЗНАЧЕНА ДЛЯ ГОСТЕЙ.</div>
+        <div class="line sys">Введи root-пароль. Или не вводи. Мы всё равно не знаем, что делать.</div>
+      </div>
+      <div class="term-input-row">
+        <span class="prompt">root@gate:~#</span>
+        <input class="term-input" id="rootcmd" type="text" autocomplete="off" spellcheck="false" aria-label="Root командная строка" placeholder="пароль или команда">
+      </div>
+
+      <div class="solve-box" style="margin-top:18px">
+        <div class="label">Служебная панель</div>
+        <p class="dim">Тут мог быть главный приз. Или ловушка. Или ловушка, притворяющаяся призом.</p>
+        <div class="row">
+          <button class="btn btn-amber" id="try-login" type="button">Попробовать войти</button>
+          <button class="btn" id="escape-btn" type="button">Прервать доступ</button>
+        </div>
+        <div class="feedback" id="feedback"></div>
+        <div class="frag-reveal" data-frag></div>
+      </div>
+
+      <div class="hints">
+        <button class="btn btn-amber hint-btn" data-hint="1" data-label="Улика I">Улика I</button>
+        <button class="btn btn-amber hint-btn" data-hint="2" data-label="Улика II">Улика II</button>
+        <div class="hint-body" data-hint-body="1">«Не каждый замок берут ключом.<br>Иногда дверь — это не вход, а выход.»</div>
+        <div class="hint-body" data-hint-body="2">«Сто раз стучать в стену — глупо.<br>Команда побега короче, чем кажется.»</div>
+      </div>
+
+      <div class="footnav">
+        <a class="btn btn-dim" href="index.html">← Главный терминал</a>
+        <a class="btn btn-dim" href="map.html">← Карта секторов</a>
+        <a class="btn btn-dim" href="vault.html">Хранилище</a>
+      </div>
+    </div>
+  </header>
+</div>
+
+<script src="js/core.js"></script>
+<script>
+(function () {
+  const K = window.KOVCHEGG;
+  const term = document.getElementById("faketerm");
+  const input = document.getElementById("rootcmd");
+  const fb = document.getElementById("feedback");
+  let attempts = 0;
+
+  const JOKES = {
+    "кабилджон": "Кабилджона убили на лестнице. Этот пароль тоже мёртв.",
+    "kabiljon": "Кабилджона убили на лестнице — и он уже не пришлёт пароль.",
+    "коч братана": "Коча братана ебали, а не дали пароль. Держись.",
+    "коч": "Коча братана ебали. И это не пароль, это диагноз.",
+    "чмоканье деда": "Мы не храним это в root. Даже мы не настолько смелые.",
+    "дед": "Чмок.",
+    "fiji": "Это ты, Фиджи. Но root — это не про ник.",
+    "kovchegg": "Имя сервера — ключ ко многим вещам. Но не к этой двери.",
+    "password": "password — это не пароль, это крик о помощи.",
+    "1234": "Серьёзно? 1234? Мы специально закрыли этот пароль в 2007-м.",
+    "root": "Пароль «root»? Мы хотя бы ценим попытку.",
+    "admin": "Нет.",
+    "капсд": "kapsd не оставлял пароль. Он оставил подсказку — и даже две.",
+  };
+
+  function print(text, cls) {
+    const div = document.createElement("div");
+    div.className = "line " + (cls || "");
+    div.textContent = text;
+    term.appendChild(div);
+    term.scrollTop = term.scrollHeight;
+  }
+
+  function fail(msg) {
+    fb.className = "feedback show bad";
+    fb.textContent = msg;
+  }
+
+  function tryPassword(raw) {
+    const val = K.normalize(raw);
+    attempts++;
+    if (JOKES[val]) {
+      print("> " + raw, "sys");
+      print(JOKES[val], "warn");
+    } else {
+      print("> " + raw, "sys");
+      const msgs = [
+        "ACCESS DENIED. Пароль не совпал. Или совпал не с тем.",
+        "ACCESS DENIED. Эта дверь не дверь. Подумай об этом.",
+        "ACCESS DENIED. Ты третий раз стучишь в стену. Стена не откроется.",
+      ];
+      print(msgs[Math.min(attempts - 1, msgs.length - 1)], "err");
+    }
+    if (attempts === 3) {
+      print("", "sys");
+      print("ХВАТИТ. Эта панель — мираж. Она существует, чтобы ты здесь потерялся.", "warn");
+      print("Подсказка от kapsd: выход — это тоже команда. Попробуй escape.", "warn");
+      fail("КОНЕЦ ТУПИКА // введи команду: escape");
+    } else if (attempts > 3) {
+      fail("Ты всё ещё здесь? Набери: escape");
+    } else {
+      fail("ДОСТУП ОТКЛОНЁН // попытка " + attempts + " из ∞");
+    }
+  }
+
+  function escapeHoneypot() {
+    print("", "sys");
+    print("ПРЕРЫВАНИЕ СОЕДИНЕНИЯ ...", "warn");
+    print("honeypot-модуль деактивирован. FIDJI покидает root-зону.", "ok");
+    print("но сначала — памятка от kapsd:", "sys");
+    print("«не всякая ловушка — пустая. даже в тупике лежит фрагмент».", "warn");
+    fb.className = "feedback show good";
+    fb.textContent = "ЛОВУШКА ПОКИНУТА // ты не вошёл в root. ты выбрался — и это лучше.";
+    K.revealFragment(5, "PROTO",
+      '<div class="next-node"><div class="label">Следующий узел</div>' +
+      '<p>Фрагмент <b>PROTO</b>. Половина слова «ПРОТОКОЛ» уже у тебя. Вторую половину прячет повреждённый файл-призрак.</p>' +
+      '<a href="stego.html">[ К ПОВРЕЖДЁННОМУ ФАЙЛУ: stego.html ]</a></div>' +
+      '<p class="dim" style="margin-top:12px">Спасибо, что не сломал панель. Она старалась.</p>'
+    );
+  }
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    const raw = input.value.trim();
+    if (!raw) return;
+    input.value = "";
+    const cmd = K.normalize(raw);
+    if (["escape", "exit", "прервать", "выход", "quit", "q"].includes(cmd)) {
+      print("> " + raw, "sys");
+      escapeHoneypot();
+      return;
+    }
+    if (cmd === "help") {
+      print("> help", "sys");
+      print("доступные команды: escape, exit, прервать. всё остальное — попытка войти.", "warn");
+      return;
+    }
+    tryPassword(raw);
+  });
+
+  document.getElementById("try-login").addEventListener("click", () => {
+    tryPassword(input.value.trim() || "root");
+    input.value = "";
+    input.focus();
+  });
+  document.getElementById("escape-btn").addEventListener("click", escapeHoneypot);
+
+  console.log("%c// ловушка. но ты уже внутри — значит, пора наружу.", "color:#ff3355");
+  console.log("%c// подсказка: escape / exit / прервать", "color:#ffb000");
+})();
+</script>
+</body>
+</html>

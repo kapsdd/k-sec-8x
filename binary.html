@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>KOVCHEGG-SECURE // бинарный узел</title>
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="rain"></canvas>
+<div class="crt"></div>
+
+<div class="shell">
+  <!--
+    // узел 02 // 8 бит на символ, ascii
+    // подсказка: console.log(btoa) — не надо. тут обычный ascii.
+    // следующий реальный узел: map.html
+  -->
+  <header class="chassis">
+    <div class="chassis-bar">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="chassis-title">kovchegg-secure // /dev/binary-stream</div>
+      <div>02</div>
+    </div>
+    <div class="chassis-body">
+      <nav class="hud" data-hud data-total="8"></nav>
+
+      <div class="label">Узел 02 // бинарный поток</div>
+      <h1 class="glitch" data-text="НУЛИ И ЕДИНИЦЫ">НУЛИ И ЕДИНИЦЫ</h1>
+      <p class="lede">Поток данных повреждён на уровне байтов. Осталось прочитать его глазами.</p>
+      <p>Фиджи, ты программист. Для тебя это разминка — но приятная.</p>
+
+      <h2>Дамп потока</h2>
+      <pre class="code" id="bin">01000111 01010010 01000101 01000101 01001110
+01001100 01001001 01000111 01001000 01010100</pre>
+      <p class="dim">Каждая группа из восьми бит — один символ. Между группами пробел. Всё в верхнем регистре.</p>
+
+      <h2>Служебная строка</h2>
+      <pre class="code">0x4B 0x4F 0x56 0x20 0x61 0x72 0x6B 0x20 0x6F 0x6E 0x6C 0x69 0x6E 0x65</pre>
+      <p class="dim">Это уже hex — и это просто подпись системы: «KOV ark online». Не путай поток с подписью.</p>
+
+      <div class="solve-box">
+        <div class="label">Узел 02 // приём ответа</div>
+        <p>Расшифруй <b>дамп потока</b> и введи полученное слово (одно слово, латиница).</p>
+        <form id="solve-form" data-feedback="#feedback">
+          <div class="row">
+            <input type="text" placeholder="СЛОВО" aria-label="Ответ" required>
+            <button type="submit">Декодировать</button>
+          </div>
+        </form>
+        <div class="feedback" id="feedback"></div>
+        <div class="frag-reveal" data-frag></div>
+      </div>
+
+      <div class="hints">
+        <button class="btn btn-amber hint-btn" data-hint="1" data-label="Улика I">Улика I</button>
+        <button class="btn btn-amber hint-btn" data-hint="2" data-label="Улика II">Улика II</button>
+        <div class="hint-body" data-hint-body="1">«Восемь бит — одно созвучье.<br>Разбей поток на восемь — и услышишь слово.»</div>
+        <div class="hint-body" data-hint-body="2">«Где ночь — ноль, а день — единица,<br>там алфавит звучит без границ.»</div>
+      </div>
+
+      <div class="footnav">
+        <a class="btn btn-dim" href="index.html">← Главный терминал</a>
+        <a class="btn btn-dim" href="logs-07.html">← Журнал system-07</a>
+      </div>
+    </div>
+  </header>
+</div>
+
+<script src="js/core.js"></script>
+<script>
+(function () {
+  const K = window.KOVCHEGG;
+  K.bindSolve("#solve-form", ["greenlight", "green light", "green-light"], () => {
+    const fb = document.getElementById("feedback");
+    fb.className = "feedback show good";
+    fb.textContent = "ПОТОК ДЕКОДИРОВАН // GREENLIGHT принят системой.";
+    K.revealFragment(3, "GG",
+      '<div class="next-node"><div class="label">Следующий узел</div>' +
+      '<p>Дальше — не логи, а карта секторов «Ковчегга». Как в метроидвании: двери, ключи, запертые комнаты.</p>' +
+      '<a href="map.html">[ ОТКРЫТЬ КАРТУ СЕКТОРОВ: map.html ]</a></div>'
+    );
+  });
+  console.log("%c// 01000111 01010010 01000101 01000101 01001110 01001100 01001001 01000111 01001000 01010100", "color:#4e8f66");
+  console.log("%c// не ленись. переведи.", "color:#ffb000");
+})();
+</script>
+</body>
+</html>

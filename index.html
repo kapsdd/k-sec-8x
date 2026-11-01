@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>KOVCHEGG-SECURE // узел 00</title>
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="rain"></canvas>
+<div class="crt"></div>
+
+<div class="shell">
+  <!--
+    // оператор kapsd
+    // архив оставлен открытым намеренно
+    // подсказка №0: если вывод кажется полным — открой исходник страницы (Ctrl+U)
+    // подсказка №00: atob() в консоли браузера умеет больше, чем кажется
+  -->
+  <header class="chassis">
+    <div class="chassis-bar">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="chassis-title">kovchegg-secure // ssh guest@kovchegg.local</div>
+      <div>00</div>
+    </div>
+    <div class="chassis-body">
+      <nav class="hud" data-hud data-total="8"></nav>
+
+      <h1 class="glitch" data-text="АРХИВ КОВЧЕГГА">АРХИВ КОВЧЕГГА</h1>
+      <p class="lede">Несанкционированный доступ. Гостевая сессия: <code>FIDJI</code>.</p>
+      <p class="dim">Оператор <code>kapsd</code> оставил архив открытым. Внутри — восемь фрагментов протокола доступа. Собери их, и хранилище примет тебя.</p>
+
+      <div class="ascii">  ██╗  ██╗ ██████╗ ██╗   ██╗ ██████╗██╗  ██╗███████╗ ██████╗  ██████╗
+  ██║ ██╔╝██╔═══██╗██║   ██║██╔════╝██║  ██║██╔════╝██╔════╝ ██╔════╝
+  █████╔╝ ██║   ██║██║   ██║██║     ███████║█████╗  ██║  ███╗██║  ███╗
+  ██╔═██╗ ██║   ██║██║   ██║██║     ██╔══██║██╔══╝  ██║   ██║██║   ██║
+  ██║  ██╗╚██████╔╝╚██████╔╝╚██████╗██║  ██║███████╗╚██████╔╝╚██████╔╝
+  ╚═╝  ╚═╝ ╚═════╝  ╚═════╝  ╚═════╝╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝</div>
+
+      <h2>Системный терминал</h2>
+      <p>Введи <code>help</code> — увидишь доступные команды. Узлы квеста — не сайты, а логи взломанной системы.</p>
+
+      <div class="term" id="term"></div>
+      <div class="term-input-row">
+        <span class="prompt">guest@kovchegg:~$</span>
+        <input class="term-input" id="cmd" type="text" autocomplete="off" spellcheck="false" aria-label="Командная строка" autofocus>
+      </div>
+
+      <div class="solve-box">
+        <div class="label">Узел 00 // подтверждение маршрута</div>
+        <p>Найди в архиве зашифрованный манифест и введи <b>имя файла</b> следующего узла (то, что идёт после <code>node:/</code>).</p>
+        <form id="solve-form" data-feedback="#feedback">
+          <div class="row">
+            <input type="text" placeholder="имя файла, например something.html" aria-label="Ответ" required>
+            <button type="submit">Проверить маршрут</button>
+          </div>
+        </form>
+        <div class="feedback" id="feedback"></div>
+        <div class="frag-reveal" data-frag></div>
+      </div>
+
+      <div class="hints">
+        <button class="btn btn-amber hint-btn" data-hint="1" data-label="Улика I">Улика I</button>
+        <button class="btn btn-amber hint-btn" data-hint="2" data-label="Улика II">Улика II</button>
+        <div class="hint-body" data-hint-body="1">«В архиве три файла, но путь один.<br>Начни с `ls` — как начинал в былом.»</div>
+        <div class="hint-body" data-hint-body="2">«Суффикс — не украшенье, а шифр.<br>Сорок шесть ступеней — и цифры станут буквой.»</div>
+      </div>
+
+      <div class="footnav">
+        <a class="btn btn-dim" href="vault.html">Хранилище фрагментов</a>
+        <a class="btn btn-dim" href="robots.txt">robots.txt</a>
+      </div>
+    </div>
+  </header>
+</div>
+
+<script src="js/core.js"></script>
+<script>
+(function () {
+  const term = document.getElementById("term");
+  const cmd = document.getElementById("cmd");
+  const K = window.KOVCHEGG;
+
+  const FILES = {
+    "manifest.b64": "bm9kZTovbG9ncy0wNy5odG1s",
+    "readme.txt": [
+      "ЖУРНАЛ ОПЕРАТОРА kapsd",
+      "─────────────────────────",
+      "Я открыл архив. Ты, Фиджи, — единственный, кто способен его прочитать.",
+      "Восемь фрагментов. Восемь узлов. Один протокол.",
+      "",
+      "Не всё, что важно, видно в выводе команд.",
+      "Комментарии в коде — тоже улики. Это я тебе как программист программисту.",
+    ].join("\n"),
+    "core.sys": [
+      "KERNEL: kovchegg-3.1.4",
+      "STATUS: COMPROMISED // but in a good way",
+      "USERS: root (sealed), kapsd (vanished), FIDJI (you)",
+      "SERVER: Ковчегг // minecraft-ark // still alive",
+    ].join("\n"),
+  };
+
+  const boot = [
+    { text: "kernels loading [############################] 100%", cls: "sys" },
+    { text: "mounting /dev/ark ... ok", cls: "sys" },
+    { text: "decrypting archive sectors ... ok", cls: "sys" },
+    { text: "WARNING: guest session detected // operator: FIDJI", cls: "warn" },
+    { text: "WARNING: протокол доступа не завершён // фрагменты: 0/8", cls: "warn" },
+    { text: "архив КОВЧЕГГ открыт. введи help, чтобы начать.", cls: "ok" },
+    { text: "", cls: "sys" },
+  ];
+
+  function print(text, cls) {
+    const div = document.createElement("div");
+    div.className = "line " + (cls || "");
+    div.textContent = text;
+    term.appendChild(div);
+    term.scrollTop = term.scrollHeight;
+  }
+
+  K.typewriter(term, boot, () => {
+    print("гостевой ввод активен. жду команду.", "sys");
+  });
+
+  const COMMANDS = {
+    help() {
+      print("доступные команды:", "ok");
+      print("  help          — эта справка");
+      print("  whoami        — кто ты в этой системе");
+      print("  ls            — содержимое архива");
+      print("  cat <файл>    — прочитать файл");
+      print("  status        — состояние протокола");
+      print("  decrypt       — попытка расшифровки манифеста");
+      print("  hint          — мягкая подсказка");
+      print("  clear         — очистить терминал");
+      print("  reset         — стереть ВЕСЬ прогресс (начать заново)");
+      print("  sudo <что>    — попытка получить root");
+    },
+    whoami() {
+      print("guest//FIDJI", "ok");
+      print("роль: оперативник. допуск: временный. потенциал: максимальный.", "sys");
+      print("последний вход kapsd оставил фрагменты протокола прямо в архиве.", "sys");
+    },
+    ls() {
+      print("manifest.b64    readme.txt    core.sys", "ok");
+      print("3 файла. один из них ведёт дальше.", "sys");
+    },
+    status() {
+      const all = K.readFragments();
+      const n = Object.keys(all).filter((k) => all[k]).length;
+      print("протокол доступа: " + n + "/8 фрагментов", n > 0 ? "ok" : "warn");
+      print("хранилище: ЗАКРЫТО до полной сборки", "sys");
+    },
+    decrypt() {
+      print("попытка расшифровки manifest.b64 ...", "sys");
+      print("алгоритм подсказок: суффикс файла уже сказал тебе всё.", "warn");
+      print("если сомневаешься: это base64. декодер есть в консоли браузера.", "warn");
+    },
+    hint() {
+      print("подсказка: команда cat умеет читать файлы. начни с manifest.b64", "warn");
+    },
+    clear() {
+      term.innerHTML = "";
+    },
+    reset() {
+      const msg = K.resetAll();
+      print(msg, "ok");
+      print("фрагменты, фазы и всё остальное стёрто. HUD пуст.", "sys");
+    },
+    sudo(args) {
+      print("sudo: unable to resolve host '" + (args || "root") + "'", "err");
+      print("ты не root. ты Фиджи. и честно говоря, это звучит гордее.", "sys");
+      print("root-панель — ловушка. настоящий путь лежит через журналы.", "warn");
+    },
+  };
+
+  cmd.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    const raw = cmd.value.trim();
+    if (!raw) return;
+    print("guest@kovchegg:~$ " + raw, "sys");
+    cmd.value = "";
+    const parts = raw.split(/\s+/);
+    const name = parts[0].toLowerCase();
+    const rest = parts.slice(1).join(" ");
+
+    if (name === "cat") {
+      const key = rest.toLowerCase();
+      if (FILES[key]) {
+        print(FILES[key], "ok");
+        if (key === "manifest.b64") {
+          print("", "sys");
+          print("// суффикс .b64 — это base64. декодируй и найди имя следующего узла.", "warn");
+        }
+      } else {
+        print("cat: " + (rest || "?") + ": нет такого файла", "err");
+      }
+      return;
+    }
+    if (COMMANDS[name]) {
+      COMMANDS[name](rest);
+    } else {
+      print("команда не найдена: " + name + " // набери help", "err");
+    }
+  });
+
+  K.bindSolve("#solve-form", ["logs-07.html", "/logs-07.html", "logs-07", "node:/logs-07.html"], () => {
+    const fb = document.getElementById("feedback");
+    fb.className = "feedback show good";
+    fb.textContent = "МАРШРУТ ПОДТВЕРЖДЁН // узел 00 закрыт.";
+    K.revealFragment(1, "KOV",
+      '<div class="next-node"><div class="label">Следующий узел</div>' +
+      '<p>Журнал системы повреждён, но код жив. Шифр сдвига ждёт там.</p>' +
+      '<a href="logs-07.html">[ ПЕРЕЙТИ В ЖУРНАЛ: logs-07.html ]</a></div>'
+    );
+  });
+
+  console.log("%c// KOVCHEGG-SECURE", "color:#33ff66; font-size:16px");
+  console.log("%c// комментарии в коде — тоже улики. Ctrl+U работает.", "color:#ffb000");
+  console.log("%c// manifest.b64 — это base64. atob() рядом.", "color:#4e8f66");
+})();
+</script>
+</body>
+</html>
